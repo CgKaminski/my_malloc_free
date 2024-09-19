@@ -15,7 +15,15 @@ typedef struct block {
 static char heap[HEAP_SIZE];
 static block_t *free_list = (block_t *)heap;
 
-
+void split_block(block_t *fitting_slot, size_t size) {
+  block_t *new = (void *)((char *)fitting_slot + size + BLOCK_SIZE);
+  new->size = (fitting_slot->size) - size - BLOCK_SIZE;
+  new->free = 1;
+  new->next = fitting_slot->next;
+  fitting_slot->size = size;
+  fitting_slot->free = 0;
+  fitting_slot->next = new;
+}
 
 void *malloc(size_t size) {
   if (!size) return NULL;
@@ -25,7 +33,7 @@ void *malloc(size_t size) {
     // Check if block is free and has enough space
     if (current->free && current->size >= size) {
       if (current->size > size + BLOCK_SIZE) {
-        // TODO split block
+        split_block(current, size);
       }
       current->free = 0;
       return (void *)(++current);
