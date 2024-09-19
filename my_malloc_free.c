@@ -1,19 +1,15 @@
-// my *malloc() and free() implementation
-
-#define HEAP_START 0x80010000
-#define HEAP_END 0x80020000
-#define HEAP_SIZE (HEAP_END - HEAP_START)
-
-typedef struct block {
-  size_t size;
-  int free;
-  struct block *next;
-} block_t;
-
-#define BLOCK_SIZE sizeof(block_t)
+#include "my_malloc_free.h"
 
 static char heap[HEAP_SIZE];
 static block_t *free_list = (block_t *)heap;
+
+void initialize_memory_system() {
+  // Set the free_list to the start of the heap
+  free_list = (block_t *)heap;
+  free_list->size = HEAP_SIZE - BLOCK_SIZE;
+  free_list->free = 1;
+  free_list->next = NULL;
+}
 
 void split_block(block_t *fitting_slot, size_t size) {
   block_t *new = (void *)((char *)fitting_slot + size + BLOCK_SIZE);

@@ -1,21 +1,13 @@
 #include <stdio.h>
 #include "my_malloc_free.h"
 
-void initialize_memory_system() {
-  // Set the free_list to the start of the heap
-  free_list = (block_t *)heap;
-  free_list->size = HEAP_SIZE - BLOCK_SIZE;
-  free_list->free = 1;
-  free_list->next = NULL;
-}
-
 int main() {
 
   // Initialize the memory system
   initialize_memory_system();
 
   // Test 1: Allocate memory for a single interger
-  int *num (int *)malloc(sizeof(int));
+  int *num = (int *)malloc(sizeof(int));
   if (!num) {
     printf("Failed to allocate memory for num\n");
     return 1;
@@ -39,6 +31,6 @@ int main() {
   free(arr);
 
 
-  printf("Memory allocation free and tests complete.")
+  printf("Memory allocation free and tests complete.");
   return 0;
 }
