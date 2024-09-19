@@ -45,5 +45,10 @@ void *malloc(size_t size) {
 
 
 void free(void *ptr) {
-  return NULL;
+  if (!ptr) return; // Safety check
+
+  // Move back to the block header
+  block_t *block = (block_t *)ptr -1;
+  block->free = 1;
+  return;
 }
