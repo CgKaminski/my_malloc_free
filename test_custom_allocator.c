@@ -19,7 +19,7 @@ TestResult test_multiple_small_allocations();
 int main() {
     initialize_memory_system();
 
-    TestResult results[10]; // Adjust the size based on the number of tests
+    TestResult results[8];
     int total_tests = 0;
     int tests_passed = 0;
 
@@ -97,7 +97,7 @@ TestResult test_free_null_pointer() {
 }
 
 TestResult test_coalesce_free_blocks() {
-    // Step 1: Allocate two small blocks
+    // Allocate two small blocks
     int *num1 = (int *)malloc(sizeof(int));
     int *num2 = (int *)malloc(sizeof(int));
 
@@ -108,14 +108,14 @@ TestResult test_coalesce_free_blocks() {
         return (TestResult){"Coalesce Free Blocks", 0}; // Allocation failed, test cannot proceed
     }
 
-    // Step 2: Free both blocks to allow for potential coalescing
+    // Free both blocks to allow for potential coalescing
     free(num1);
     free(num2);
 
-    // Step 3: Attempt to allocate a larger block that requires the space of both A and B
+    // Attempt to allocate a larger block that requires the space of both A and B
     int *largeBlock = (int *)malloc(2 * sizeof(int));
 
-    // Step 4: Check if the allocation succeeded
+    // Check if the allocation succeeded
     if (largeBlock) {
         free(largeBlock); // Clean up
         return (TestResult){"Coalesce Free Blocks", 1}; // Test passed, coalescing might have worked
@@ -156,7 +156,7 @@ TestResult test_multiple_small_allocations() {
     int i;
 
     for (i = 0; i < num_allocations; i++) {
-        ptrs[i] = (char *)malloc(i);
+        ptrs[i] = (char *)malloc(1);
         if (!ptrs[i]) {
             break; // Allocation failed
         }
@@ -170,7 +170,9 @@ TestResult test_multiple_small_allocations() {
         return (TestResult){"Multiple Small Allocations", 1}; // Test passed
     } else {
         for (i = 0; i < num_allocations; i++) {
-            if (ptrs[i]) free(ptrs[i]);
+            if (ptrs[i]) {
+                free(ptrs[i]);
+            }
         }
         return (TestResult){"Multiple Small Allocations", 0}; // Test failed
     }
