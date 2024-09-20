@@ -39,6 +39,17 @@ void *malloc(size_t size) {
   return NULL; // No free block found with enough space
 }
 
+void coalesce_free_blocks() {
+  block_t *current = free_list;
+  while (current) {
+    if (current->free && current->next && current->next->free) {
+      current->size += BLOCK_SIZE + current->next->size;
+      current->next = current->next->next;
+    } else {
+      current = current->next;
+    }
+  }
+}
 
 void free(void *ptr) {
   if (!ptr) return; // Safety check
@@ -46,5 +57,8 @@ void free(void *ptr) {
   // Move back to the block header
   block_t *block = (block_t *)ptr -1;
   block->free = 1;
+
+  // Coalesce free blocks
+  coalesce_free_blocks();
   return;
 }
