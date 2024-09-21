@@ -98,4 +98,3 @@ void free(void *ptr) {
 	coalesce_free_blocks();
 	return;
 }
-

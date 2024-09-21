@@ -23,45 +23,52 @@ Must implement the following two functions:
 ---
 
 ## Design Approach
-
-*Describe the high-level design of the solution*
+The design of the custom `malloc` and `free` functions involves a simple approach that manages contiguous blocks of memory as a heap. The heap is represented as a static array, and memory blocks within the heap are managed using a linked list of the block headers. Each block header contains metadata regarding the block, such as size and whether it is free.
 
 ---
 
 ## Function Descriptions
 
 ### `void *malloc(size_t bytes);`
+Allocates a contiguous block of memory of at least the specified size (`bytes`) and returns a pointer to the allocated space. The function manages the heap memory within a predefined range, represented as a static array. The allocation process involves:
 
-*Provide details about how function is implemented, how memory is allocated, and how splitting of blocks is handled.*
+1. Checks for allocatable size: If the requested memory allocation is zero, the function returns `NULL`.
+2. Block Search: Traverses the free list to find a free block that is at least as large as the allocation request.
+3. Block Splitting: If a large enough block is found and it is larger than the request size (plus overhead), the block is split into two separate blocks. The first block is allocated and the second remains free.
+4. Allocation: The selected block is marked as allocated, and a pointer to the next block header is returned.
+5. Insufficient Memory: If a large enough block is not found, the function returns `NULL`.
 
 ---
 
 ### `void free(void *ptr);`
+Takes a pointer returned by `malloc` and returns the corresponding block of memory back to the heap for reuse. The de-allocation process involves:
 
-*Explain how `free()` works, how blocks are returned to the heap, and how block coalescing (if any) is managed.*
-
----
-
-## Memory Management
-
-*Explain how memory is tracked, how block metadata is handled, and what data structures are used (e.g., free list, linked list of blocks).*
+1. Safety Check: If the pointer is `NULL` the function returns immediately.
+2. Block Header: The function finds the block header by moving the pointer back by the size of the block header.
+3. Mark as Free: The block metadata is marked as free.
+4. Coalescing Free Blocks: Merges adjacent free blocks into a single larger block reducing fragmentation and making larger contiguous blocks of memory for future allocations.
 
 ---
 
 ## Limitations and Assumptions
 
-*Describe any assumptions made (e.g., no external libraries are used) and any limitations of the current implementation.*
+1. `malloc` shall not request more heap space.
+2. Single threaded environment.
+3. No reallocation.
+4. No error handling for corruption, as this would conflict with problem requirements for `free`.
 
 ---
 
 ## Testing
+To ensure functionality I created a small custom test suite for the custom `malloc` and `free` functions.
 
-*Provide instructions or descriptions of how to test the `malloc` and `free` functions to ensure they work correctly.*
-
----
-
-## Future Improvements
-
-*List potential areas for improvement, optimizations, or enhancements to the current implementation.*
+1. Single Integer Allocation: Tests allocating memory for a single integer and verifies that the allocation is successful.
+2. Array of Integers Allocation: Tests allocating memory for an array of 10 integers and verifies that the allocation is successful.
+3. Zero Allocation: Tests allocating zero bytes and verifies that the function returns `NULL`.
+4. Free NULL Pointer: Tests freeing a `NULL` pointer and verifies that the function handles it gracefully.
+5. Coalesce Free Blocks: Tests the coalescing of adjacent free blocks by allocating and freeing two small blocks, then attempting to allocate a larger block that requires the space of both.
+6. Allocate Entire Heap: Tests allocating memory for the entire heap and verifies that the allocation is successful.
+7. Allocate Out of Memory: Tests allocating memory beyond the heap size and verifies that the function returns `NULL`.
+8. Multiple Small Allocations: Tests allocating multiple small blocks and verifies that all allocations are successful.
 
 ---
