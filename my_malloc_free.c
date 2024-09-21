@@ -1,3 +1,28 @@
+/*
+ * my_malloc_free.c
+ * 
+ * This file contains the implementation of a custom memory allocation and 
+ * deallocation system for a 32-bit computer with a specified heap range.
+ * The functions provided are:
+ * 
+ * - void *malloc(size_t bytes): Allocates memory of the specified size.
+ * - void free(void *ptr): Frees the memory block pointed to by ptr.
+ * 
+ * The heap range is from 0x80010000 to 0x80020000. The memory system is 
+ * initialized using the initialize_memory_system() function.
+ * 
+ * Author: Cameron Kaminski
+ * Date: 09/20/2024
+ * 
+ * Notes:
+ * - Memory allocations are aligned to the word size (4 bytes) for a 32-bit 
+ *   system.
+ * - The free list is used to manage free memory blocks and coalesce adjacent 
+ *   free blocks.
+ * - As per specificaitons of the assignemnt, there is minimal error checking.
+ * - Each function makes the assumption that the heap is suitably allocated.
+ */
+
 #include "my_malloc_free.h"
 
 static char heap[HEAP_SIZE];
@@ -44,8 +69,12 @@ void split_block(block_t *fitting_slot, size_t size) {
  * Returns Type : void *
 */
 void *malloc(size_t size) {
-	if (!size) return NULL;
+	if (size == 0) return NULL;
 
+	// Align the size to a multiple of WORD_SIZE
+	size = ALIGN(size);
+
+	// Traverse the free list to find a block that fits the requested size
 	block_t *current = free_list;
 	while (current) {
 		// Check if block is free and has enough space
@@ -88,10 +117,15 @@ void coalesce_free_blocks() {
  * Returns Type : void
  */
 void free(void *ptr) {
-	if (!ptr) return; // Safety check
+	if (ptr == NULL) return; // Safety check
 
 	// Move back to the block header
-	block_t *block = (block_t *)ptr -1;
+	block_t *block = (block_t *)ptr - 1;
+
+	// Boundry check
+	if ((char *)block < heap || (char *)block >= heap + HEAP_SIZE) return;
+
+	// Mark block as free
 	block->free = 1;
 
 	// Coalesce free blocks

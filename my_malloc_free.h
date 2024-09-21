@@ -7,7 +7,10 @@
 #define HEAP_START 0x80010000
 #define HEAP_END 0x80020000
 #define HEAP_SIZE (HEAP_END - HEAP_START)
+#define WORD_SIZE 4 
+
 #define BLOCK_SIZE sizeof(block_t)
+#define ALIGN(size) (((size) + (WORD_SIZE - 1)) & ~(WORD_SIZE - 1))
 
 /*
  * Define the block structure. Each block contains a size field to store the
