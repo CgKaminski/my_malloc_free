@@ -56,6 +56,7 @@ Takes a pointer returned by `malloc` and returns the corresponding block of memo
 2. Single threaded environment.
 3. No reallocation.
 4. No error handling for corruption, as this would conflict with problem requirements for `free`.
+5. `malloc` and `free` assume that the heap has been properly initialized. 
 
 ---
 
